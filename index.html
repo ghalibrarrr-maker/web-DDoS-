@@ -1,0 +1,134 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encrypted HTML - Prank Site</title>
+<style>
+  html, body {
+    margin:0; padding:0; height:100%;
+    background:#f4f4f4;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Segoe UI', sans-serif;
+  }
+  #start-button {
+    font-size:1.5rem;
+    padding:1rem 2.5rem;
+    background: linear-gradient(135deg, #7b2cbf, #9d4edd);
+    color:white;
+    border:none;
+    border-radius:12px;
+    box-shadow:0 8px 20px rgba(123,44,191,0.3);
+    cursor:pointer;
+    transition: all 0.3s ease;
+  }
+  #start-button:hover {
+    transform: scale(1.05);
+    box-shadow:0 10px 25px rgba(123,44,191,0.5);
+  }
+  #jumpscare {
+    display:none;
+    position:fixed; inset:0;
+    background:black; z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #jumpscare img {
+    width:100%; height:100%; object-fit:cover;
+  }
+  #stop-button {
+    position:absolute; top:20px; right:20px;
+    background:red; color:white; border:none; padding:10px; border-radius:50%; cursor:pointer; z-index:10000;
+    display:none;
+  }
+  #flash {
+    position:fixed; inset:0;
+    background:white; z-index:10000;
+    opacity:1; display:none;
+  }
+  audio { display:none; }
+</style>
+</head>
+<body>
+
+<button id="start-button">MASUK</button>
+
+<div id="jumpscare">
+  <img src="https://i.makeagif.com/media/12-12-2023/O_rv3C.gif" alt="Scary Face" />
+  <button id="stop-button">STOP</button>
+  <audio id="scream" src="https://files.catbox.moe/tfqzkm.mp3"></audio>
+</div>
+
+<div id="flash"></div>
+
+<script>
+const btn = document.getElementById('start-button');
+const scare = document.getElementById('jumpscare');
+const stopBtn = document.getElementById('stop-button');
+const scream = document.getElementById('scream');
+const flash = document.getElementById('flash');
+let jumpscareActive = false;
+
+// Fungsi getar sedang
+function getar() {
+  if(navigator.vibrate){
+    navigator.vibrate(200);
+  }
+}
+
+// Fungsi flash flicker
+function flashFlicker(){
+  flash.style.display='block';
+  let count=0;
+  const interval=setInterval(()=>{
+    flash.style.opacity = flash.style.opacity==='1'?'0':'1';
+    count++;
+    if(count>5){ clearInterval(interval); flash.style.display='none'; }
+  },150);
+}
+
+// Fungsi aktivasi jumpscare
+async function activateJumpscare(){
+  const el = document.documentElement;
+  if(el.requestFullscreen) await el.requestFullscreen().catch(()=>{});
+  else if(el.webkitRequestFullscreen) await el.webkitRequestFullscreen().catch(()=>{});
+
+  scare.style.display='flex';
+  stopBtn.style.display='block';
+  scream.volume = 0.7;
+  scream.play();
+  getar();
+  flashFlicker();
+  jumpscareActive = true;
+}
+
+// Stop jumpscare
+stopBtn.onclick = () => {
+  scare.style.display='none';
+  stopBtn.style.display='none';
+  scream.pause();
+  scream.currentTime = 0;
+  document.exitFullscreen().catch(()=>{});
+  jumpscareActive = false;
+  navigator.vibrate(0);
+};
+
+// Tombol MASUK
+btn.onclick = ()=>{ activateJumpscare(); history.pushState(null,null,location.href); };
+
+// Before unload
+window.addEventListener('beforeunload', function (e) {
+  if(jumpscareActive) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+history.pushState(null,null,location.href);
+</script>
+
+</body>
+</html>
+```
